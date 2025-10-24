@@ -16,6 +16,7 @@ Dependencies used across scripts:
 - python-safer
 - docxtpl
 - usaddress
+- LibreOffice
 
 ---
 
