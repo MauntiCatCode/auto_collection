@@ -1,0 +1,14 @@
+cffi==1.17.1
+charset-normalizer==3.4.3
+cryptography==45.0.6
+numpy==2.3.2
+pandas==2.3.1
+pillow==11.3.0
+pycparser==2.22
+pypdf==5.9.0
+PyPDFForm==3.3.2
+python-dateutil==2.9.0.post0
+pytz==2025.2
+reportlab==4.4.3
+six==1.17.0
+tzdata==2025.2

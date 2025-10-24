@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+import pandas as pd
+
+import argparse
+
+from app import process_companies
+from log import log, MODULE_DIR
+
+
+SPREADSHEETS_DIR = f"{MODULE_DIR}/spreadsheets"
+USDOTS_PATH = f"{MODULE_DIR}/usdots.csv"
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        prog="AutoIFTA",
+        description="A tool for automatically creating personalized samples of filled-out fuel tax reports."
+    )
+    parser.add_argument(
+        "spreadsheet",
+        help="Name of the CSV file (without extension) in the spreadsheets directory, e.g., 'ifta'."
+    )
+    parser.add_argument(
+        "template",
+        help="Name of the Word (.docx) template to use (without extension), e.g., 'ifta'."
+    )
+    parser.add_argument(
+        "output_dir",
+        help="Path to the output directory where filled reports will be saved."
+    )
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+
+    spreadsheet = args.spreadsheet
+    template = args.template
+    output_dir = args.output_dir
+
+    # Load the .csv spreadsheet of USDOTS from a .csv and convert it to a list
+    log.info(f"Loading usdots at '{USDOTS_PATH}'.")
+    usdots = pd.read_csv(USDOTS_PATH)["USDOT"].astype(str).tolist()
+    log.info(f"Loaded {len(usdots)} USDOT numbers.")
+
+    log.info(f"Using spreadsheet at: '{SPREADSHEETS_DIR}/{spreadsheet}.csv'.")
+    companies = pd.read_csv(f"{SPREADSHEETS_DIR}/{spreadsheet}.csv", dtype=str).set_index("DOT#")
+
+    process_companies(usdots, companies, template, output_dir)
+
+    
+if __name__ == "__main__":
+    main()

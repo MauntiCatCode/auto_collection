@@ -1,0 +1,12 @@
+// Map of text FilteredCompany attributes
+// to form fields in MCS-150 form
+
+
+{
+    "legal_name": "1bizName",
+    "dba_name": "2dbaName",
+    "usdot": "16usdotNumber",
+    "phone": "13bizPhone",
+    "mc": "17mcmxNumber",
+    "mileage": "21carrierMileage"
+}

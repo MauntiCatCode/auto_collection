@@ -1,0 +1,52 @@
+// Map of FilteredCompany attribute data
+// to checkboxes in MCS-150 form
+
+
+{
+    // COMPANY OPERATIONS
+    "Interstate" : "22aBox",
+    "Intrastate Only (HM)"  : "22bBox",
+    "Intrastate Only (Non-HM)" : "22cBox",
+    // OPERATION CLASSIFICATIONS
+    "Auth. For Hire" : "23aBox",
+    "Exempt For Hire" : "23bBox",
+    "Private(Property)" : "23cBox",
+    "Priv. Pass. (Business)" : "23dBox",
+    "Priv. Pass.(Non-business)" : "23eBox",
+    "Migrant" : "23fBox",
+    "U.S. Mail" : "23gBox",
+    "Fed. Gov't" : "23hBox",
+    "State Gov't" : "23iBox",
+    "Local Gov't" : "23jBox",
+    "Indian Nation" : "23kBox",
+    // CARGO CLASSIFICATIONS
+    "General Freight" : "24aBox",
+    "Household Goods" : "24bBox",
+    "Metal: sheets, coils, rolls" : "24cBox",
+    "Motor Vehicles" : "24dBox",
+    "Drive/Tow away" : "24eBox",
+    "Logs, Poles, Beams, Lumber" : "24fBox",
+    "Building Materials" : "24gBox",
+    "Mobile Homes" : "24hBox",
+    "Machinery, Large Objects" : "24iBox",
+    "Fresh Produce" : "24jBox",
+    "Liquids/Gases" : "24kBox",
+    "Intermodal Cont." : "24lBox",
+    "Passengers" : "24mBox",
+    "Oilfield Equipment" : "24nBox",
+    "Livestock":"24oBox",
+    "Grain, Feed, Hay" : "24pBox",
+    "Coal/Coke" : "24qBox",
+    "Meat":"24rBox",
+    "Garbage/Refuse" : "24sBox",
+    "US Mail" : "24tBox",
+    "Chemicals" : "24uBox",
+    "Commodities Dry Bulk" : "24vBox",
+    "Refrigerated Food" : "24wBox",
+    "Beverages" : "24xBox",
+    "Paper Products" : "24yBox",
+    "Utilities" : "24zBox",
+    "Agricultural/Farm Supplies" : "24aaBox",
+    "Construction" : "24bbBox",
+    "Water Well" : "24ccBox"
+}

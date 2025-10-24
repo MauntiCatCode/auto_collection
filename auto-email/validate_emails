@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+import pandas as pd
+
+import requests
+import time
+import argparse
+from datetime import datetime
+
+from log import log
+from config import Config
+from utils import parse_duration, save_email_bool_map
+
+
+def verify_email(email: str) -> dict | None:
+    """Helper function to verify a single email."""
+    url = f"https://easyemailapi.com/api/verify/{email}"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # raises exception when not 2xx
+        return response.json()  # return parsed JSON data
+    except requests.exceptions.RequestException as e:
+        log.error(f"Request error for {email}: {e}")
+        return None
+
+
+def emails_to_boolmap(email_list, valid_threshold, sleep_time, start_time=datetime.now(), duration_limit_sec=None) -> dict:
+    """
+    Converts an iterable of emails to a dictionary with emails as keys 
+    and boolean values indicating whether the email is valid.
+
+    Has a built in duration limit.
+    """
+    email_status_map = {}
+ 
+    for email in email_list:
+        # Check time limit
+        if duration_limit_sec:
+            elapsed = (datetime.now() - start_time).total_seconds()
+            if elapsed > duration_limit_sec:
+                log.warning("Time limit reached. Stopping validation.")
+                break
+        
+        log.debug(f"Verifying email: '{email}'.")
+
+        # Verify email via EasyEmailAPI
+        data = verify_email(email)
+        if not data:
+            email_status_map[email] = False  # Mark as False (invalid) if no data or error
+            continue
+
+        score = data.get("score", 0)
+
+        # Check if the score meets the validity threshold
+        if score >= valid_threshold:
+            email_status_map[email] = True
+            log.info(f"Email '{email}' verified with score: {score}")
+        else:
+            email_status_map[email] = False
+            log.info(f"Email '{email}' has a low score of {score}, marking as invalid.")
+
+        # Sleep to respect rate limit
+        log.debug(f"Sleeping for {sleep_time} seconds before next email...")
+        time.sleep(sleep_time)
+    
+    # Summary logging
+    total = len(email_status_map)
+    if total > 0:
+        valid_count = sum(email_status_map.values())
+        invalid_count = total - valid_count
+        valid_pct = (valid_count / total) * 100
+        log.info(f"Processed {total} emails: {valid_count} valid, {invalid_count} invalid. ({valid_pct:.2f}% valid).")
+    else:
+        log.info("No emails were processed.")
+
+    return email_status_map
+
+
+def main(duration_limit_sec: int):
+    start_time = datetime.now()
+    
+    input_csv = Config.companies_csv_path
+    output_file = Config.EMAILS_BOOLMAP_PATH           # Path to save updated results
+    email_validity_map = Config.emails_boolmap  # Loaded at startup
+    
+    raw_email_list = set(pd.read_csv(input_csv)['email'].tolist())
+    checked_emails = set(email_validity_map)
+    
+    emails = raw_email_list - checked_emails
+    log.info(f"Loaded {len(raw_email_list)} unique emails from CSV. {len(checked_emails)} already checked. Processing {len(emails)} emails.")
+
+    new_results = {}
+
+    
+    result = emails_to_boolmap(
+        email_list=emails,
+        valid_threshold=90,
+        sleep_time=8,
+        start_time=start_time,
+        duration_limit_sec=duration_limit_sec
+        ) 
+    if result:
+        new_results.update(result)
+
+    # Save updates if any
+    if new_results:
+        email_validity_map.update(new_results)
+        save_email_bool_map(email_validity_map, output_file, label="email validity map")
+        log.info(f"Saved {len(new_results)} new email results to '{output_file}'.")
+    else:
+        log.info("No new emails were validated.")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Email Validator with ignore list and time limit")
+    parser.add_argument("duration", type=parse_duration, help="Time to run (e.g. '1h 30m', '10m')")
+    args = parser.parse_args()
+
+    main(args.duration)

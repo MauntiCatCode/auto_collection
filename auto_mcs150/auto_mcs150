@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+import os
+import time
+
+from loading import load_companies_from_csv
+from filtering import filtered_companies
+from cli import parse_arguments
+from utils import handled_paths
+from log import log
+from config import Config
+
+def main():
+    start_time = time.time()
+
+    args = parse_arguments()
+
+    h_paths = handled_paths(args)
+    path_to_mcs150_template = h_paths.get("path_to_mcs150_template")
+    path_to_mcs150 = h_paths.get("path_to_mcs150")
+
+    log.info(f"Fetching data from the SAFER database...")
+    companies = load_companies_from_csv(args.usdots_path, args.max_retries, args.time_before_retry, args.usdot_column or "usdot")
+    loaded_count = len(companies)
+
+    log.info(f"Filtering {loaded_count} companies based on MCS-150 last update and out of service status...")
+    companies = filtered_companies(companies,
+                                exclude_out_of_service = not args.accept_out_of_service,
+                                before = args.before)
+    filtered_count = len(companies)
+
+    log.info(f"Filling forms for {filtered_count} companies...")
+    forms_count = 0
+    for company in companies:
+        name, usdot = None, None
+        try:
+            name, usdot = company.legal_name, company.usdot
+            path_to_filled_form = os.path.join(path_to_mcs150, f"{name}.pdf")  # type: ignore
+            form = company.filled_form(path_to_mcs150_template, args.spreadsheet_path or Config.SPREADSHEET_PATH)
+            form.write(path_to_filled_form)
+            log.debug(f"Saving filled MCS-150 Form for '{company.legal_name}' at: '{path_to_filled_form}'.")
+            forms_count += 1
+        except Exception as e:
+            log.error(f"Error filling form for {name or "Unknown"} (USDOT: {usdot or "Unknown"}): {e}")
+    
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    log.info(f"{forms_count} forms saved at '{path_to_mcs150}'.")
+
+    log.info(f"Exiting program. Execution took {elapsed_time:.2f} seconds.")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,18 @@
+// Map of FilteredCompany tuple addresses
+// to address fields in MCS-150 form
+
+
+{
+    "physical_address":[
+        "3principalStreet",
+        "4principalCity",
+        "5principalState",
+        "6principalZip"
+    ],
+    "mailing_address":[
+        "8mailStreet",
+        "9mailCity",
+        "10mailState",
+        "11mailZip"
+    ]
+}

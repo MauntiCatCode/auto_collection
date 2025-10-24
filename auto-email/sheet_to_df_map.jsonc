@@ -1,0 +1,20 @@
+// Map of company spreadsheet headers to inner dataframe headers
+{
+    // Траковые компании штат Illinois/California/Florida/Texas 20-50/50-100/100-200 Power units
+    "Название компании":"company_name",
+    "Power Units":"power_units",
+    "drivers":"drivers",
+    "trailers":"trailers",
+    "usdot":"usdot",
+    "MCS-150 future date":"mcs150_future_date",
+    "MCS-150 last update":"mcs150_last_update",
+    "дата создания компании":"date_created",
+    "Адрес":"physical_address",
+    "имя контактного лица":"contact_name",
+    "фамилия контактного лица":"contact_surname",
+    "email":"email",
+    "cell (мобільний)":"cellphone",
+    "phone (стационарный)":"phone",
+    "fax":"fax",
+    "related companies":"related_companies"
+}
